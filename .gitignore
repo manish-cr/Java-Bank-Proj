@@ -1,0 +1,34 @@
+# Application properties (contains sensitive data like DB credentials)
+application.properties
+application-dev.properties
+application.properties
+**/application-*.properties
+
+# But keep example/template files if you have them
+!**/application-example.properties
+!**/application-template.properties
+
+# Compiled files
+target/
+*.class
+*.jar
+*.war
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+
+# Logs
+*.log
+logs/
