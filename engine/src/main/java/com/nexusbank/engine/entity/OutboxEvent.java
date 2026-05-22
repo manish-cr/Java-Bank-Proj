@@ -2,6 +2,8 @@ package com.nexusbank.engine.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -24,6 +26,7 @@ public class OutboxEvent {
     @Column(name = "event_type", length = 50, nullable = false)
     private String eventType;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "payload_json", columnDefinition = "jsonb", nullable = false)
     private String payloadJson;
 
