@@ -40,4 +40,10 @@ public class ProductStateSavings {
 
     @Column(name = "last_compound_date")
     private LocalDate lastCompoundDate;
+
+    @Column(name = "rate_type", length = 20, nullable = false)
+    private String rateType;
+
+    @Column(name = "rate_code", length = 30)
+    private String rateCode;
 }

@@ -41,11 +41,19 @@ public class InterestAccrualService {
 
             Object[] spResult = (Object[]) query.getSingleResult();
 
+            result.put("accountId", spResult[0]);
             result.put("daysProcessed", spResult[1]);
             result.put("interestAccrued", spResult[2]);
-            result.put("status", spResult[3]);
-            result.put("message", spResult[4]);
-            result.put("success", "SUCCESS".equals(spResult[3]) || "SKIPPED".equals(spResult[3]));
+            result.put("rateType", spResult[3]);
+            result.put("effectiveRate", spResult[4]);
+            result.put("status", spResult[5]);
+            result.put("message", spResult[6]);
+            result.put("success", "SUCCESS".equals(spResult[5]) || "SKIPPED".equals(spResult[5]));
+
+            if ("SUCCESS".equals(spResult[5])) {
+                log.info("Interest accrued: account={}, days={}, rateType={}, rate={}, interest={}",
+                    spResult[0], spResult[1], spResult[3], spResult[4], spResult[2]);
+            }
         } catch (Exception e) {
             log.error("Interest accrual failed for account {}: {}", accountId, e.getMessage());
             result.put("success", false);
@@ -58,8 +66,6 @@ public class InterestAccrualService {
 
     @Transactional
     public Map<String, Object> accrueDailyInterestForAllAccounts() {
-        List<Account> accounts = accountRepository.findActiveByCustomerId(null);
-        // Actually get all active savings accounts
         List<UUID> savingsAccountIds = accountRepository.findAll().stream()
             .filter(a -> "SAVINGS".equals(a.getAccountType()) && "ACTIVE".equals(a.getStatus()))
             .map(Account::getAccountId)
@@ -77,7 +83,7 @@ public class InterestAccrualService {
             .map(CompletableFuture::join)
             .collect(Collectors.toList());
 
-        long successCount = results.stream().filter(r -> (boolean) r.get("success")).count();
+        long successCount = results.stream().filter(r -> (boolean) r.getOrDefault("success", false)).count();
         long failCount = results.size() - successCount;
         BigDecimal totalInterest = results.stream()
             .filter(r -> r.get("interestAccrued") != null)
@@ -121,15 +127,15 @@ public class InterestAccrualService {
 
     @Transactional
     public Map<String, Object> compoundAllDueAccounts() {
-        List<Account> savingsAccounts = accountRepository.findAll().stream()
+        List<UUID> savingsAccountIds = accountRepository.findAll().stream()
             .filter(a -> "SAVINGS".equals(a.getAccountType()) && "ACTIVE".equals(a.getStatus()))
+            .map(Account::getAccountId)
             .collect(Collectors.toList());
 
         List<Map<String, Object>> results = new ArrayList<>();
         int compounded = 0;
         int skipped = 0;
 
-        // Check which accounts are due for compounding
         String checkSql = """
             SELECT pss.account_id, pss.compounding_frequency
             FROM product_state_savings pss

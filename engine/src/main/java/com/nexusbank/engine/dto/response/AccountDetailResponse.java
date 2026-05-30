@@ -27,6 +27,7 @@ public class AccountDetailResponse {
     private UUID customerId;
     private String customerName;
 
+    // Product-specific
     private BigDecimal interestRate;
     private BigDecimal monthlyFee;
     private BigDecimal overdraftLimit;
@@ -34,4 +35,19 @@ public class AccountDetailResponse {
     private BigDecimal monthlyPayment;
     private LocalDate nextPaymentDate;
     private Integer daysPastDue;
+
+    // Rate info
+    private String rateType;
+    private String rateCode;
+    private String compoundingFrequency;
+    private BigDecimal interestAccruedPending;
+    private BigDecimal interestAccruedYtd;
+
+    // ARM fields
+    private String referenceRateCode;
+    private BigDecimal margin;
+    private LocalDate nextRateAdjustment;
+    private BigDecimal annualCap;
+    private BigDecimal lifetimeCap;
+    private BigDecimal lifetimeFloor;
 }

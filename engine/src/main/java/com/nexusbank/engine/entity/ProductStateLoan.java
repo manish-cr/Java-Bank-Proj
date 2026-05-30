@@ -46,4 +46,34 @@ public class ProductStateLoan {
 
     @Column(name = "total_interest_paid_ytd", precision = 19, scale = 4, nullable = false)
     private BigDecimal totalInterestPaidYtd;
+
+    @Column(name = "rate_type", length = 20, nullable = false)
+    private String rateType;
+
+    @Column(name = "rate_code", length = 30)
+    private String rateCode;
+
+    @Column(name = "reference_rate_code", length = 20)
+    private String referenceRateCode;
+
+    @Column(precision = 7, scale = 4)
+    private BigDecimal margin;
+
+    @Column(name = "fixed_period_months")
+    private Integer fixedPeriodMonths;
+
+    @Column(name = "adjustment_frequency", length = 20)
+    private String adjustmentFrequency;
+
+    @Column(name = "next_rate_adjustment")
+    private LocalDate nextRateAdjustment;
+
+    @Column(name = "annual_cap", precision = 7, scale = 4)
+    private BigDecimal annualCap;
+
+    @Column(name = "lifetime_cap", precision = 7, scale = 4)
+    private BigDecimal lifetimeCap;
+
+    @Column(name = "lifetime_floor", precision = 7, scale = 4)
+    private BigDecimal lifetimeFloor;
 }
