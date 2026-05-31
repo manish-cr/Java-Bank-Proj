@@ -1,0 +1,52 @@
+# ============================================================================
+# NexusBank Engine - Docker Compose
+# Two services: PostgreSQL 16 + Spring Boot application
+# ============================================================================
+
+services:
+
+  db:
+    image: postgres:16-alpine
+    container_name: nexusbank-db
+    environment:
+      POSTGRES_DB: nexusbank
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d nexusbank"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - nexusbank-network
+
+  app:
+    build: .
+    container_name: nexusbank-app
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/nexusbank
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-postgres}
+      SPRING_PROFILES_ACTIVE: prod
+      FRED_API_KEY: ${FRED_API_KEY:-}
+      CURRENCY_API_KEY: ${CURRENCY_API_KEY:-}
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - nexusbank-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  nexusbank-network:
+    driver: bridge
